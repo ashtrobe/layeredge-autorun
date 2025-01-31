@@ -1,6 +1,7 @@
 # Layer Edge Auto Bot
 
-- website : https://dashboard.layeredge.io/
+- Website : https://dashboard.layeredge.io/
+- Use referral code ```pYRTM7ed```
 
 ## Features
 
