@@ -2,9 +2,5 @@
     {
         "address": "YOUR ADDRESS 1",
         "privateKey": "YOUR PK 1"
-    },
-    {
-        "address": "YOUR ADDRESS 2",
-        "privateKey": "YOUR PK 2"
     }
 ]
