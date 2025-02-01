@@ -14,4 +14,4 @@ export default `\n
        ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝    
 
                    LAYER EDGE AUTO - BOT                
-     📢  Telegram Channel: https://t.me/AirdropInsiderID `;
+     Base Code Credit - AirdropInsiderID;
