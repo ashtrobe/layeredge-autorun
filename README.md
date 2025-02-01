@@ -4,7 +4,7 @@
 - Use referral code ```pYRTM7ed```
 
 ## Features
-
+- **Auto Daily Check-in**
 - **Auto Run Node**
 - **Support Proxy usage**
 - **Auto Claim Points every hour**
