@@ -51,10 +51,11 @@ const logger = {
         let formattedMessage = `${header} ${timestamp} ${levelTag} ${message}`;
         
         if (value) {
+            const formattedValue= typeof value === 'object' ? JSON.stringify(value) : value;
             const valueStyle = level === 'error' ? chalk.red : 
                              level === 'warn' ? chalk.yellow : 
                              chalk.green;
-            formattedMessage += ` ${valueStyle(value)}`;
+            formattedMessage += ` ${valueStyle(formattedValue)}`;
         }
 
         if (error && this.verbose) {
@@ -318,32 +319,43 @@ class LayerEdgeConnection {
         }
     }
 
-    async dailyCheckIn() {
-        const timestamp = Date.now();
-        const message = `Daily check-in request for ${this.wallet.address} at ${timestamp}`;
-        const sign = await this.wallet.signMessage(message);
+    // Fix daily check-in signature
+  async dailyCheckIn() {
+    try {
+      const timestamp = Date.now();
+      const message = `I am claiming my daily node point for ${this.wallet.address} at ${timestamp}`;
+      const sign = await this.wallet.signMessage(message);
+      const dataSign = { sign, timestamp, walletAddress: this.wallet.address };
+      const config = {
+        data: dataSign,
+        headers: { 'Content-Type': 'application/json' }
+      };
 
-        const dataSign = {
-            sign: sign,
-            timestamp: timestamp,
-            walletAddress: this.wallet.address
-        };
+      const response = await this.makeRequest(
+        "post",
+        "https://referralapi.layeredge.io/api/light-node/claim-node-points",
+        config
+      );
 
-        const response = await this.makeRequest(
-            "post",
-            "https://referralapi.layeredge.io/api/light-node/claim-node-points",
-            { data: dataSign }
-        );
-
-        if (response && response.data) {
-            logger.info("Daily Check in Result:", response.data);
-            return true;
+      if (response && response.data) {
+        if (response.data.statusCode && response.data.statusCode === 405) {
+          const cooldownMatch = response.data.message.match(/after\s+([^!]+)!/);
+          const cooldownTime = cooldownMatch ? cooldownMatch[1].trim() : "unknown time";
+          logger.info("⚠️ Daily Check-in Already Completed", `Come back after ${cooldownTime}`);
+          return true;
         } else {
-            logger.error("Failed to perform daily check-in");
-            return false;
+          logger.info("✅ Daily Check-in Successful", formatResponse(response.data));
+          return true;
         }
+      } else {
+        logger.error("❌ Daily Check-in Failed");
+        return false;
+      }
+    } catch (error) {
+      logger.error("Error during daily check-in:", error);
+      return false;
     }
-
+  }
     async checkNodeStatus() {
         const response = await this.makeRequest(
             "get",
